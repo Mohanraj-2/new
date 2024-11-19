@@ -96,6 +96,7 @@ def login_page(request):
     if request.method=='POST':
       name=request.POST.get('username')
       pwd=request.POST.get('password')
+      print ("name",name,pwd)
       user=authenticate(request,username=name,password=pwd)
       if user is not None:
         login(request,user)
