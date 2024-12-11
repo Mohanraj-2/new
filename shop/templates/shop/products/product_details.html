@@ -62,70 +62,39 @@ ShopKart | Product Details
           <button class="btn btn-danger" id="btnFav">
             <i class="fa fa-heart"></i> Add to Favorites
           </button>
+
+          <!-- Pay Now Button -->
+          <button class="btn btn-success mt-3" id="checkout-button">Pay Now</button>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Script Section -->
+<!-- Include Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function(event) {
-  const btnPlus = document.getElementById("btnPlus");
-  const btnMinus = document.getElementById("btnMinus");
-  const txtQty = document.getElementById("txtQty");
-  const pid = document.getElementById("pid");
-  const btnCart = document.getElementById("btnCart");
-  const btnFav = document.getElementById("btnFav");
+    const stripe = Stripe("{{ stripe_public_key }}");
 
-  // Increment Quantity
-  btnPlus.addEventListener("click", function() {
-    let qty = parseInt(txtQty.value, 10) || 0;
-    if (qty < 10) txtQty.value = qty + 1;
-  });
-
-  // Decrement Quantity
-  btnMinus.addEventListener("click", function() {
-    let qty = parseInt(txtQty.value, 10) || 0;
-    if (qty > 1) txtQty.value = qty - 1;
-  });
-
-  // Add to Cart
-  btnCart.addEventListener("click", function() {
-    const qty = parseInt(txtQty.value, 10) || 0;
-    if (qty > 0) {
-      fetch("/addtocart", {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': '{{ csrf_token }}',
-        },
-        body: JSON.stringify({ product_qty: qty, pid: pid.value })
-      })
-      .then(response => response.json())
-      .then(data => alert(data.status));
-    } else {
-      alert("Please enter a valid quantity.");
-    }
-  });
-
-  // Add to Favorites
-  btnFav.addEventListener("click", function() {
-    fetch("/fav", {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: JSON.stringify({ pid: pid.value })
-    })
-    .then(response => response.json())
-    .then(data => alert(data.status));
-  });
-});
+    document.getElementById("checkout-button").addEventListener("click", function () {
+        fetch("{% url 'checkout' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                product_id: "{{ products.id }}",
+                amount: "{{ products.selling_price }}"
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                window.location.href = data.url;
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
 </script>
 {% endblock content %}

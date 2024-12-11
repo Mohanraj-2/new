@@ -1,13 +1,13 @@
 {% extends 'shop/layouts/main.html' %}
 {% block title %}
-  Registration | ShopKart
+  Cart | ShopKart
 {% endblock title %}
 {% block content %}
-  <section class="bg-light py-4 my-5" style="min-height:600px;">
+<section class="bg-light py-4 my-5" style="min-height:600px;">
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <h4 class="mb-3">Cart  Items</h4>
+          <h4 class="mb-3">Cart Items</h4>
           <hr style="border-color:#b8bfc2;">
         </div>
       
@@ -21,7 +21,6 @@
                 <th>Remove</th>
             </tr>
           
-
             {% for item in cart %}
            <tr>
               <td><img src="{{item.product.product_image.url}}" height="75px" alt="{{item.product.name}}"></td>
@@ -29,7 +28,9 @@
               <td>{{item.product.selling_price | stringformat:'d'}}</td>
               <td>{{item.product_qty}}</td>
               <td class="amt">{{item.total_cost | stringformat:'d'}}</td>
-              <td><a href="{% url 'remove_cart' item.id %}"  onclick="return confirm('Are you sure? to Remove')"  class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Remove</a></td>
+              <td><a href="{% url 'remove_cart' item.id %}" onclick="return confirm('Are you sure? to Remove')" class="btn btn-danger btn-sm">
+                <i class="fa fa-trash"></i> Remove
+              </a></td>
             </tr>
             {% endfor %}
             <tr>
@@ -37,24 +38,26 @@
               <td></td>
               <td colspan="2"><b>Total Amount</b></td>
               <th id="net">0</th>
-              <td><button class="btn btn-primary btn-sm">
-                <i class="fa fa-check-circle"></i> Check Out
-              </button></td>
+              <td>
+                <!-- Update the button with a link to the checkout page -->
+                <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm">
+                  <i class="fa fa-check-circle"></i> Check Out
+                </a>
+              </td>
             </tr>
-           
         </table>
        
       </div>
-      </div>
-  </section>
+    </div>
+</section>
 
-  <script>
+<script>
+    // Calculate total amount dynamically
     const nodes = document.querySelectorAll('.amt');
     const arr = Array.from(nodes);
     const res = arr.reduce((acc, curr) => {
      return acc += Number(curr.textContent)
     }, 0);
-    document.getElementById("net").innerHTML="Rs : "+res;
-
-  </script>
+    document.getElementById("net").innerHTML = "Rs : " + res;
+</script>
 {% endblock content %}

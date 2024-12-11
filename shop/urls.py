@@ -19,4 +19,6 @@ urlpatterns= [
     path('addtocart',views.add_to_cart,name="addtocart"),
     path('fav', views.fav_page, name="fav"),
     path('cart/item_count/', views.cart_item_count, name='cart_item_count'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('checkout/payment/', views.payment_view, name='payment_view'),
 ]

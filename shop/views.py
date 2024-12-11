@@ -6,6 +6,13 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
+from django.conf import settings
+import stripe
+from .models import Product
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Home view
 def home(request):
@@ -151,3 +158,39 @@ def product_details(request,cname,pname):
     else:
       messages.error(request,"No Such Catagory Found")
       return redirect('collections')
+    
+
+    
+
+
+def checkout(request):
+    if request.method == 'POST':
+        try:
+            print("Creating payment intent")
+            intent = stripe.PaymentIntent.create(
+                amount=1000,  # Amount in cents
+                currency='inr',
+                payment_method_types=['card'],
+            )
+            print("Payment intent created successfully")
+            return JsonResponse({'clientSecret': intent['client_secret']})
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({'error': str(e)})
+
+    return render(request, 'checkout.html')
+
+from django.http import HttpResponse
+
+def payment_view(request):
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        amount = request.POST.get("amount")
+
+        # Fetch the product details
+        product = get_object_or_404(Product, id=product_id)
+
+        # Payment integration logic goes here
+        # Example: Redirect to a payment gateway or process payment here
+        return HttpResponse(f"Processing payment for {product.name} of amount ₹{amount}")
+    return HttpResponse("Invalid Request", status=400)
